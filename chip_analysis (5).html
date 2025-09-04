@@ -1,0 +1,1372 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>芯片公司数据分析 | 核心数据一览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        success: '#00B42A',
+                        dark: '#1D2129',
+                        'dark-2': '#4E5969',
+                        'light-1': '#F2F3F5',
+                        'light-2': '#E5E6EB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .text-gradient {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .progress-bar {
+                @apply h-2 rounded-full bg-light-2 overflow-hidden;
+            }
+            .progress-value {
+                @apply h-full transition-all duration-500 ease-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-microchip text-primary text-2xl"></i>
+                    <h1 class="text-xl font-bold text-dark">芯片企业数据分析</h1>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#overview" class="text-dark-2 hover:text-primary transition-colors">公司概览</a>
+                    <a href="#details" class="text-dark-2 hover:text-primary transition-colors">详细对比</a>
+                    <a href="#shareholders" class="text-dark-2 hover:text-primary transition-colors">股东结构</a>
+                    <a href="#investment" class="text-dark-2 hover:text-primary transition-colors">投资建议</a>
+                </nav>
+                
+                <button class="md:hidden text-dark" id="mobile-menu-button">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white shadow-md absolute w-full" id="mobile-menu">
+            <div class="container mx-auto px-4 py-3 space-y-3">
+                <a href="#overview" class="block text-dark-2 hover:text-primary transition-colors py-2">公司概览</a>
+                <a href="#details" class="block text-dark-2 hover:text-primary transition-colors py-2">详细对比</a>
+                <a href="#shareholders" class="block text-dark-2 hover:text-primary transition-colors py-2">股东结构</a>
+                <a href="#investment" class="block text-dark-2 hover:text-primary transition-colors py-2">投资建议</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 页面标题和简介 -->
+        <section class="mb-12 text-center">
+            <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold mb-4 text-gradient">国产芯片核心企业数据对比</h2>
+            <p class="text-dark-2 max-w-3xl mx-auto text-lg">
+                全面解析海光信息、寒武纪、摩尔线程、景嘉微、壁仞科技和沐曦集成电路的估值、业绩、股东背景及投资价值
+            </p>
+        </section>
+        
+        <!-- 公司概览卡片 -->
+        <section id="overview" class="mb-16">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold">公司概览</h3>
+                <div class="flex space-x-2">
+                    <button class="filter-btn active px-4 py-2 rounded-full bg-primary text-white text-sm" data-filter="all">全部</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-light-1 text-dark-2 text-sm hover:bg-light-2 transition-colors" data-filter="listed">已上市</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-light-1 text-dark-2 text-sm hover:bg-light-2 transition-colors" data-filter="pre-ipo">Pre-IPO</button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 海光信息 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover listed" data-company="海光信息">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">海光信息</h4>
+                        <span class="px-3 py-1 bg-success/10 text-success text-xs rounded-full">已上市</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">市值约 4053 亿元</p>
+                        <p class="text-dark-2 text-sm">A股上市（688041）</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">高流动性：2025-09-03成交额42.8亿元</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-line-chart text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">2025Q1营收24.3亿元(+38.7%)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-shield text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">中科曙光控股(27.96%)</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+                
+                <!-- 寒武纪 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover listed" data-company="寒武纪">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">寒武纪</h4>
+                        <span class="px-3 py-1 bg-success/10 text-success text-xs rounded-full">已上市</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">市值约 5095 亿元</p>
+                        <p class="text-dark-2 text-sm">A股上市</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">极高流动性：指数与融资客推动</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-line-chart text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">2025H1营收 28.81 亿元</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-user text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">陈天石持股约 28.63%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+                
+                <!-- 摩尔线程 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover pre-ipo" data-company="摩尔线程">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">摩尔线程</h4>
+                        <span class="px-3 py-1 bg-warning/10 text-warning text-xs rounded-full">Pre-IPO</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">估值约 255 亿元</p>
+                        <p class="text-dark-2 text-sm">科创板IPO获受理</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">未上市，场内流动性缺失</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-line-chart text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">2024年营收 4.38 亿元</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-institution text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">红杉中国、腾讯、字节跳动参投</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+                
+                <!-- 景嘉微 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover listed" data-company="景嘉微">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">景嘉微</h4>
+                        <span class="px-3 py-1 bg-success/10 text-success text-xs rounded-full">已上市</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">市值约 412 亿元</p>
+                        <p class="text-dark-2 text-sm">A股上市</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">中高流动性：成交额约 15.97 亿元</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-line-chart text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">2025H1扣非净利同比降约 550%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-institution text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">国家大基金持股约 5.00%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+                
+                <!-- 壁仞科技 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover pre-ipo" data-company="壁仞科技">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">壁仞科技</h4>
+                        <span class="px-3 py-1 bg-warning/10 text-warning text-xs rounded-full">Pre-IPO</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">估值约 140 亿元</p>
+                        <p class="text-dark-2 text-sm">拟赴港递交上市申请</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">未上市，场内流动性缺失</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-microchip text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">BR100单卡算力约 1 PFLOPS</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-institution text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">启明创投、高瓴等参投</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+                
+                <!-- 沐曦集成电路 -->
+                <div class="company-card bg-white rounded-xl shadow-sm p-6 card-hover pre-ipo" data-company="沐曦集成电路">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold">沐曦集成电路</h4>
+                        <span class="px-3 py-1 bg-warning/10 text-warning text-xs rounded-full">Pre-IPO</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-2xl font-bold text-primary mb-1">估值约 180 亿元</p>
+                        <p class="text-dark-2 text-sm">计划2026年申报科创板</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5">
+                        <div class="flex items-center">
+                            <i class="fa fa-exchange text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">未上市，场内流动性缺失</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-line-chart text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">2024年营收 2.75 亿元</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-institution text-dark-2 w-5"></i>
+                            <span class="text-dark-2 ml-2">美团、华为哈勃、中金资本参投</span>
+                        </div>
+                    </div>
+                    
+                    <button class="details-btn w-full py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium">
+                        查看详情
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 详细数据对比 -->
+        <section id="details" class="mb-16">
+            <h3 class="text-2xl font-bold mb-8">核心数据对比</h3>
+            
+            <!-- 简化的图表对比 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <!-- 市值/估值对比图 -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-4">市值/估值（亿元）</h4>
+                    <div class="h-80">
+                        <canvas id="valuationChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 营收对比 -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-4">营收对比（亿元）</h4>
+                    <div class="h-80">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 简化的对比表格 -->
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-light-1">
+                            <th class="px-6 py-4 font-semibold">公司</th>
+                            <th class="px-6 py-4 font-semibold">市值/估值</th>
+                            <th class="px-6 py-4 font-semibold">最新业绩<br><span class="text-xs font-normal text-dark-2">(时间段)</span></th>
+                            <th class="px-6 py-4 font-semibold">流动性情况<br><span class="text-xs font-normal text-dark-2">(最新时间)</span></th>
+                            <th class="px-6 py-4 font-semibold">核心优势</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-light-2">
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">海光信息</td>
+                            <td class="px-6 py-4">4053亿元（A股）</td>
+                            <td class="px-6 py-4">2025Q1营收24.3亿(+38.7%)，净利润5.97亿(+42.3%)<br><span class="text-xs text-dark-2">（2025年一季度）</span></td>
+                            <td class="px-6 py-4">高流动性，2025-09-03成交额42.8亿元<br><span class="text-xs text-dark-2">（2025-09-03）</span></td>
+                            <td class="px-6 py-4">DCU产品占比提升至67%，生态覆盖广</td>
+                        </tr>
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">寒武纪</td>
+                            <td class="px-6 py-4">5700亿元（A股）</td>
+                            <td class="px-6 py-4">2025H1营收28.81亿，净利润10.38亿<br><span class="text-xs text-dark-2">（2025年上半年）</span></td>
+                            <td class="px-6 py-4">极高流动性，融资余额88.52亿元<br><span class="text-xs text-dark-2">（截至2025-09）</span></td>
+                            <td class="px-6 py-4">大模型适配好，软件栈完善</td>
+                        </tr>
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">摩尔线程</td>
+                            <td class="px-6 py-4">255亿元（Pre-IPO）</td>
+                            <td class="px-6 py-4">2024年营收4.38亿，持续投入研发<br><span class="text-xs text-dark-2">（2024年全年）</span></td>
+                            <td class="px-6 py-4">未上市，无公开交易市场<br><span class="text-xs text-dark-2">（截至2025-09）</span></td>
+                            <td class="px-6 py-4">全功能GPU底座，万卡级方案</td>
+                        </tr>
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">景嘉微</td>
+                            <td class="px-6 py-4">412亿元（A股）</td>
+                            <td class="px-6 py-4">2025H1扣非净利同比降550%<br><span class="text-xs text-dark-2">（2025年上半年）</span></td>
+                            <td class="px-6 py-4">中高流动性，日均成交约15.97亿元<br><span class="text-xs text-dark-2">（2025-09-03）</span></td>
+                            <td class="px-6 py-4">国产图形GPU积累深，生态适配广</td>
+                        </tr>
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">壁仞科技</td>
+                            <td class="px-6 py-4">140亿元（Pre-IPO）</td>
+                            <td class="px-6 py-4">BR100单卡算力约1 PFLOPS<br><span class="text-xs text-dark-2">（2025年测试数据）</span></td>
+                            <td class="px-6 py-4">未上市，无公开交易市场<br><span class="text-xs text-dark-2">（截至2025-09）</span></td>
+                            <td class="px-6 py-4">性能对标A100，运营商场景验证</td>
+                        </tr>
+                        <tr class="hover:bg-light-1/50 transition-colors">
+                            <td class="px-6 py-4 font-medium">沐曦集成电路</td>
+                            <td class="px-6 py-4">180亿元（Pre-IPO）</td>
+                            <td class="px-6 py-4">2024年营收2.75亿，研发投入占比78%<br><span class="text-xs text-dark-2">（2024年全年）</span></td>
+                            <td class="px-6 py-4">未上市，无公开交易市场<br><span class="text-xs text-dark-2">（截至2025-09）</span></td>
+                            <td class="px-6 py-4">高性能GPU，云计算与AI场景落地</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- 流动性详细分析 -->
+        <section class="mb-16">
+            <h3 class="text-2xl font-bold mb-8">流动性详细分析</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fa fa-line-chart text-primary mr-2"></i>
+                        已上市公司流动性对比
+                    </h4>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 border border-light-2 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa fa-bolt text-primary"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium">寒武纪</h5>
+                                    <p class="text-dark-2 text-sm">极高流动性</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">融资余额88.52亿元</p>
+                                <p class="text-dark-2 text-sm">纳入多重要指数</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 border border-light-2 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa fa-exchange text-primary"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium">海光信息</h5>
+                                    <p class="text-dark-2 text-sm">高流动性</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">2025-09-03成交42.8亿元</p>
+                                <p class="text-dark-2 text-sm">机构持有比例达38.7%</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 border border-light-2 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa fa-arrows-h text-primary"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium">景嘉微</h5>
+                                    <p class="text-dark-2 text-sm">中高流动性</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">日均成交约15.97亿元</p>
+                                <p class="text-dark-2 text-sm">交易活跃度中等</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fa fa-info-circle text-primary mr-2"></i>
+                        流动性说明
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <p class="text-dark-2">流动性反映股票交易活跃度和变现能力，对投资者尤其重要：</p>
+                        
+                        <div class="p-4 bg-light-1 rounded-lg">
+                            <h5 class="font-medium mb-2">寒武纪高流动性原因</h5>
+                            <ul class="text-dark-2 space-y-2 text-sm">
+                                <li>• 被纳入科创50、沪深300等多重要指数</li>
+                                <li>• 融资客大幅涌入，融资余额达88.52亿元</li>
+                                <li>• "超级牛散"章建平持有608.63万股</li>
+                                <li>• 市场关注度高，交易活跃</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="p-4 bg-light-1 rounded-lg">
+                            <h5 class="font-medium mb-2">未上市公司流动性提示</h5>
+                            <p class="text-dark-2 text-sm">
+                                摩尔线程、壁仞科技和沐曦集成电路尚未上市，普通投资者无法在公开市场交易，需通过特定渠道参与，且存在锁定期和转让限制。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 股东结构分析 -->
+        <section id="shareholders" class="mb-16">
+            <h3 class="text-2xl font-bold mb-8">股东结构与出资要点</h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-6 flex items-center">
+                        <i class="fa fa-users text-primary mr-2"></i>
+                        股东结构概览
+                    </h4>
+                    
+                    <div class="space-y-8">
+                        <!-- 海光信息股东结构 -->
+                        <div>
+                            <h5 class="font-medium mb-4">海光信息</h5>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">中科曙光</span>
+                                        <span class="text-sm font-medium">27.96%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-primary" style="width: 27.96%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">成都国资（成都产投）</span>
+                                        <span class="text-sm font-medium">8.32%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-secondary" style="width: 8.32%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">国家集成电路基金二期</span>
+                                        <span class="text-sm font-medium">7.64%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-accent" style="width: 7.64%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">UPC（AMD关联方）</span>
+                                        <span class="text-sm font-medium">5.43%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-warning" style="width: 5.43%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">其他机构与公众股东</span>
+                                        <span class="text-sm font-medium">50.65%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-danger" style="width: 50.65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-dark-2 text-sm mt-3">
+                                中科院系与国资合计占比约43.92%，中科曙光合计控制约32.10%股权，具有较强的技术和资源支持。2025年一季度UPC减持0.32%股份。
+                            </p>
+                        </div>
+                        
+                        <!-- 寒武纪股东结构 -->
+                        <div>
+                            <h5 class="font-medium mb-4">寒武纪</h5>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">陈天石（创始人）</span>
+                                        <span class="text-sm font-medium">28.63%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-primary" style="width: 28.63%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">中科算源（中科院计算所）</span>
+                                        <span class="text-sm font-medium">11.54%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-secondary" style="width: 11.54%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">机构/ETF（华夏/易方达等）</span>
+                                        <span class="text-sm font-medium">15.87%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-accent" style="width: 15.87%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">其他股东</span>
+                                        <span class="text-sm font-medium">43.96%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value bg-warning" style="width: 43.96%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 其他公司股东结构摘要 -->
+                        <div class="space-y-4">
+                            <h5 class="font-medium">其他公司</h5>
+                            
+                            <div class="p-3 bg-light-1 rounded-lg">
+                                <h6 class="font-medium text-sm mb-2">景嘉微</h6>
+                                <ul class="text-dark-2 text-sm space-y-1">
+                                    <li>• 国家大基金持股约5.00%</li>
+                                    <li>• 湖南省国资委通过湖南财信持股约11.32%</li>
+                                    <li>• 股东结构相对分散，无绝对控股股东</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="p-3 bg-light-1 rounded-lg">
+                                <h6 class="font-medium text-sm mb-2">摩尔线程</h6>
+                                <ul class="text-dark-2 text-sm space-y-1">
+                                    <li>• 南京神傲持股约14.55%</li>
+                                    <li>• 创始人张建中持股约11.06%</li>
+                                    <li>• 红杉中国持股约9.23%，腾讯投资持股约7.85%</li>
+                                    <li>• 字节跳动持股约5.42%，其他机构投资者持股约51.9%</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="p-3 bg-light-1 rounded-lg">
+                                <h6 class="font-medium text-sm mb-2">壁仞科技</h6>
+                                <ul class="text-dark-2 text-sm space-y-1">
+                                    <li>• 无控股股东，管理团队持股约23.5%</li>
+                                    <li>• 启明创投持股约15.8%，高瓴资本持股约12.3%</li>
+                                    <li>• 广东与上海国资平台合计持股约18.7%</li>
+                                    <li>• 其他机构投资者持股约29.7%</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="p-3 bg-light-1 rounded-lg">
+                                <h6 class="font-medium text-sm mb-2">沐曦集成电路</h6>
+                                <ul class="text-dark-2 text-sm space-y-1">
+                                    <li>• 创始人团队合计持股约35%</li>
+                                    <li>• 美团持股约12.8%，华为哈勃持股约8.5%</li>
+                                    <li>• 中金资本持股约7.2%，其他机构投资者持股约36.5%</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h4 class="text-lg font-semibold mb-6 flex items-center">
+                        <i class="fa fa-money text-primary mr-2"></i>
+                        融资与出资详情
+                    </h4>
+                    
+                    <div class="space-y-8">
+                        <!-- 融资总额对比 -->
+                        <div>
+                            <h5 class="font-medium mb-4">一级市场累计融资对比（亿元）</h5>
+                            <div class="h-64">
+                                <canvas id="fundingChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 融资详情 -->
+                        <div class="space-y-6">
+                            <div>
+                                <h5 class="font-medium mb-3">壁仞科技融资历史</h5>
+                                <div class="space-y-3">
+                                    <div class="border-l-2 border-primary pl-4 py-1">
+                                        <div class="font-medium text-sm">Pre-IPO轮（2025年6月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：15亿元 | 领投：广东国资、上海国资</div>
+                                        <div class="text-dark-2 text-xs">投后估值：140亿元</div>
+                                    </div>
+                                    <div class="border-l-2 border-primary pl-4 py-1">
+                                        <div class="font-medium text-sm">D轮（2024年3月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：20亿元 | 领投：高瓴资本</div>
+                                    </div>
+                                    <div class="border-l-2 border-primary pl-4 py-1">
+                                        <div class="font-medium text-sm">C轮（2023年5月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：18亿元 | 领投：启明创投</div>
+                                    </div>
+                                    <div class="border-l-2 border-primary/50 pl-4 py-1">
+                                        <div class="font-medium text-sm">A轮及之前（2020-2022年）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：约7亿元 | 投资方包括IDG资本、源码资本等</div>
+                                    </div>
+                                </div>
+                                <p class="text-dark-2 text-sm mt-2">累计融资超60亿元，投资方涵盖顶级VC与地方国资</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-medium mb-3">摩尔线程融资历史</h5>
+                                <div class="space-y-3">
+                                    <div class="border-l-2 border-accent pl-4 py-1">
+                                        <div class="font-medium text-sm">Pre-IPO轮（2024年11月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：12亿元 | 投资方：产业资本与券商</div>
+                                    </div>
+                                    <div class="border-l-2 border-accent pl-4 py-1">
+                                        <div class="font-medium text-sm">C轮（2023年8月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：15亿元 | 领投：红杉中国、腾讯</div>
+                                    </div>
+                                    <div class="border-l-2 border-accent pl-4 py-1">
+                                        <div class="font-medium text-sm">B轮（2022年6月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：15亿元 | 领投：字节跳动、美团</div>
+                                    </div>
+                                    <div class="border-l-2 border-accent/50 pl-4 py-1">
+                                        <div class="font-medium text-sm">A轮及之前（2020-2021年）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：约3亿元 | 投资方包括GGV纪源资本等</div>
+                                    </div>
+                                </div>
+                                <p class="text-dark-2 text-sm mt-2">累计融资超45亿元，互联网巨头参与度高</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-medium mb-3">沐曦集成电路融资历史</h5>
+                                <div class="space-y-3">
+                                    <div class="border-l-2 border-success pl-4 py-1">
+                                        <div class="font-medium text-sm">C+轮（2024年9月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：10亿元 | 领投：中金资本</div>
+                                        <div class="text-dark-2 text-xs">投后估值：180亿元</div>
+                                    </div>
+                                    <div class="border-l-2 border-success pl-4 py-1">
+                                        <div class="font-medium text-sm">C轮（2023年12月）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：12亿元 | 领投：美团、华为哈勃</div>
+                                    </div>
+                                    <div class="border-l-2 border-success/50 pl-4 py-1">
+                                        <div class="font-medium text-sm">A、B轮（2021-2023年）</div>
+                                        <div class="text-dark-2 text-xs">融资金额：约8亿元 | 投资方包括红点中国、深创投等</div>
+                                    </div>
+                                </div>
+                                <p class="text-dark-2 text-sm mt-2">累计融资超30亿元，产业资本与财务投资结合</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 融资特点分析 -->
+                        <div class="p-4 bg-light-1 rounded-lg">
+                            <h5 class="font-medium mb-2">融资特点分析</h5>
+                            <ul class="text-dark-2 text-sm space-y-2">
+                                <li>• 三家Pre-IPO公司均获得产业资本和财务投资机构双重支持</li>
+                                <li>• 后期融资中国资背景投资者参与度显著提升，平均占比达35%</li>
+                                <li>• 互联网巨头（腾讯、字节跳动、美团）在GPU领域布局积极</li>
+                                <li>• 华为哈勃作为半导体领域专业投资机构，重点布局沐曦集成电路</li>
+                                <li>• 融资轮次间隔缩短，显示行业热度与资本关注度持续提升</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 投资建议 -->
+        <section id="investment" class="mb-16">
+            <h3 class="text-2xl font-bold mb-8">投资方向建议</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-success">
+                    <h4 class="text-lg font-semibold mb-3">追求稳健与现金流安全</h4>
+                    <p class="text-dark-2 mb-4">重视分红与生态，优先选择：</p>
+                    <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                        <div class="bg-success/10 p-3 rounded-full mr-4">
+                            <i class="fa fa-check text-success"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">海光信息</h5>
+                            <p class="text-dark-2 text-sm">DCU 占比提升至67%、毛利高、分红意愿增强，2024年分红率达31%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-warning">
+                    <h4 class="text-lg font-semibold mb-3">追求高弹性与成长</h4>
+                    <p class="text-dark-2 mb-4">能承受波动与风险，可考虑：</p>
+                    <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                        <div class="bg-warning/10 p-3 rounded-full mr-4">
+                            <i class="fa fa-line-chart text-warning"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">寒武纪</h5>
+                            <p class="text-dark-2 text-sm">高景气带来业绩与现金流改善，但需关注库存、客户集中与实体清单风险</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-accent">
+                    <h4 class="text-lg font-semibold mb-3">关注Pre-IPO/一级市场机会</h4>
+                    <p class="text-dark-2 mb-4">具备潜在上行空间，但需承受流动性与上市不确定性：</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                            <div class="bg-accent/10 p-3 rounded-full mr-4">
+                                <i class="fa fa-rocket text-accent"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium">摩尔线程</h5>
+                                <p class="text-dark-2 text-sm">估值 255 亿元、IPO推进中</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                            <div class="bg-accent/10 p-3 rounded-full mr-4">
+                                <i class="fa fa-rocket text-accent"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium">壁仞科技</h5>
+                                <p class="text-dark-2 text-sm">估值 140 亿元、拟赴港递表</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                            <div class="bg-accent/10 p-3 rounded-full mr-4">
+                                <i class="fa fa-rocket text-accent"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium">沐曦集成电路</h5>
+                                <p class="text-dark-2 text-sm">估值 180 亿元、计划2026年申报科创板</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-danger">
+                    <h4 class="text-lg font-semibold mb-3">对短期业绩与现金流敏感</h4>
+                    <p class="text-dark-2 mb-4">谨慎看待，等待拐点验证：</p>
+                    <div class="flex items-center p-3 bg-light-1 rounded-lg">
+                        <div class="bg-danger/10 p-3 rounded-full mr-4">
+                            <i class="fa fa-exclamation-triangle text-danger"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium">景嘉微</h5>
+                            <p class="text-dark-2 text-sm">业绩承压、现金流转弱引发关注</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 爆点新闻 -->
+        <section class="mb-16">
+            <h3 class="text-2xl font-bold mb-8">爆点新闻</h3>
+            
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-light-1 flex items-center justify-center">
+                            <i class="fa fa-microchip text-5xl text-primary/30"></i>
+                        </div>
+                        <div class="md:w-2/3 p-6">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">2025-09-01</span>
+                                <span class="text-xs text-dark-2 ml-3">海光信息</span>
+                            </div>
+                            <h4 class="font-semibold text-lg mb-3">海光信息发布新一代DCU芯片，性能较上一代提升80%</h4>
+                            <p class="text-dark-2 mb-4">
+                                海光信息于2025年9月1日发布新一代DCU芯片Hygon DCU C8000，采用7nm工艺，FP64算力达到40 TFLOPS，较上一代产品提升80%，能效比提升50%。公司同时宣布与国内三大云厂商达成采购协议，预计将为2025年Q4及2026年营收带来显著增长。
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">新品发布</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">DCU</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">云厂商合作</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-light-1 flex items-center justify-center">
+                            <i class="fa fa-line-chart text-5xl text-primary/30"></i>
+                        </div>
+                        <div class="md:w-2/3 p-6">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">2025-08-27</span>
+                                <span class="text-xs text-dark-2 ml-3">寒武纪</span>
+                            </div>
+                            <h4 class="font-semibold text-lg mb-3">寒武纪股价一度登顶"A股市值王"</h4>
+                            <p class="text-dark-2 mb-4">
+                                2025年8月27日，寒武纪股价盘中飙升至1464.98元/股，总市值达5700亿元，历史性超越贵州茅台。这一里程碑得益于公司发布的惊艳半年报：上半年营收28.81亿元，同比增幅高达4347.82%；净利润从去年同期亏损5.3亿元跃变为盈利10.38亿元。
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">A股股王</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">业绩爆发</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">AI芯片</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-light-1 flex items-center justify-center">
+                            <i class="fa fa-file-text-o text-5xl text-primary/30"></i>
+                        </div>
+                        <div class="md:w-2/3 p-6">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">近期</span>
+                                <span class="text-xs text-dark-2 ml-3">摩尔线程</span>
+                            </div>
+                            <h4 class="font-semibold text-lg mb-3">摩尔线程科创板IPO获受理，拟募资80亿元</h4>
+                            <p class="text-dark-2 mb-4">
+                                摩尔线程科创板IPO申请已获受理，公司计划募资80亿元，主要用于GPU芯片研发、数据中心及AI计算平台建设等。招股书显示，2024年公司营收4.38亿元，2022-2024年研发投入累计达38.10亿元。胡润独角兽榜显示其估值为255亿元。
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">IPO</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">GPU</span>
+                                <span class="text-xs bg-light-1 px-2 py-1 rounded">募资</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- 公司详情模态框 -->
+    <div id="company-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/50" id="modal-backdrop"></div>
+        <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto relative z-10 transform transition-all duration-300 scale-95 opacity-0" id="modal-content">
+            <button id="close-modal" class="absolute top-4 right-4 text-dark-2 hover:text-dark transition-colors">
+                <i class="fa fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-6">
+                <h3 class="text-2xl font-bold mb-6" id="modal-title">公司详情</h3>
+                
+                <div class="space-y-6" id="modal-body">
+                    <!-- 动态填充内容 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-microchip text-primary text-2xl"></i>
+                        <h3 class="text-xl font-bold">芯片企业数据分析</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        提供国产芯片核心企业的全面数据分析，助力投资者了解行业动态与企业价值。
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">快速导航</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#overview" class="hover:text-primary transition-colors">公司概览</a></li>
+                        <li><a href="#details" class="hover:text-primary transition-colors">详细对比</a></li>
+                        <li><a href="#shareholders" class="hover:text-primary transition-colors">股东结构</a></li>
+                        <li><a href="#investment" class="hover:text-primary transition-colors">投资建议</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">关注我们</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-dark-2 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-dark-2 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-dark-2 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">数据更新时间：2025-09-04</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
+                © 2025 芯片企业数据分析平台. 保留所有权利.
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // 公司详细数据
+        const companyData = {
+            "海光信息": {
+                "估值/市值": "约 4053 亿元（A股，688041）",
+                "流动性": "高流动性：2025-09-03 成交额42.8亿元，换手率2.37%",
+                "业绩要点": "2025Q1营收24.3亿元(同比+38.7%)，归母净利5.97亿元(+42.3%)，毛利率65.2%",
+                "股东背景": "中科曙光持股27.96%，成都产投8.32%，国家大基金二期7.64%，UPC(AMD关联方)5.43%",
+                "公司背景": "国产CPU/DCU头部企业，x86架构授权，聚焦服务器与数据中心市场",
+                "产品优势": "DCU产品占比提升至67%，兼容主流生态，政务、金融行业落地深厚",
+                "研发投入": "2024年研发投入28.7亿元，占营收31.4%，研发人员1,200+",
+                "最新动态": "2025年9月发布新一代DCU芯片C8000，性能提升80%；与三大云厂商达成采购协议"
+            },
+            "寒武纪": {
+                "估值/市值": "约 5700 亿元（A股）",
+                "流动性": "极高流动性：指数与融资客推动，融资余额高位",
+                "业绩要点": "2025H1 营收 28.81 亿元，归母净利 10.38 亿元，经营现金流 9.11 亿元",
+                "股东背景": "陈天石约 28.63%；机构 / ETF（华夏 / 易方达上证科创板 50 等）进入前十大",
+                "公司背景": "云端 AI 芯片全栈，互联网 / 运营商 / 金融落地",
+                "产品优势": "大模型适配与软件栈完善，规模化交付",
+                "财务报告": "2025 年半年报发布",
+                "爆点新闻": "股价一度登顶 “A 股股王”，机构上调目标价；库存与客户集中、实体清单风险提示"
+            },
+            "摩尔线程": {
+                "估值/市值": "约 255 亿元（Pre-IPO）",
+                "流动性": "未上市，场内流动性缺失",
+                "业绩要点": "2024 年营收 4.38 亿元；2022-2024 年研发累计 38.10 亿元，年复合亏损收窄",
+                "股东背景": "南京神傲约 14.55%；张建中约 11.06%；红杉中国、腾讯投资、字节跳动等",
+                "公司背景": "2020 年成立，MUSA 架构 GPU/AI/ 图形 / 编解码一体",
+                "产品优势": "万卡级智算集群方案，全功能 GPU 底座",
+                "财务报告": "招股书已披露",
+                "爆点新闻": "科创板 IPO 获受理，拟募资 80 亿元；胡润独角兽榜估值 255 亿元"
+            },
+            "景嘉微": {
+                "估值/市值": "约 412 亿元（A股）",
+                "流动性": "中高流动性：2025-09-03 成交额约 15.97 亿元",
+                "业绩要点": "2025H1 扣非净利同比降约 550%，经营现金流转弱",
+                "股东背景": "国家大基金约 5.00%；股东结构较分散",
+                "公司背景": "国产 GPU 老牌，军工 / 信创基础好",
+                "产品优势": "国产图形 GPU 积累深，生态适配广",
+                "财务报告": "2025 年半年报发布",
+                "爆点新闻": "业绩承压、现金流转弱引发关注"
+            },
+            "壁仞科技": {
+                "估值/市值": "约 140 亿元（Pre-IPO）",
+                "流动性": "未上市，场内流动性缺失",
+                "业绩要点": "BR100 单卡算力约 1 PFLOPS，千卡集群落地",
+                "股东背景": "无控股股东；启明创投、高瓴等参投；Pre-IPO 由广东 / 上海国资领投",
+                "公司背景": "2019 年成立，专注通用 GPU",
+                "产品优势": "性能对标 A100，运营商场景验证",
+                "财务报告": "未上市，公开财报有限",
+                "爆点新闻": "完成约 15 亿元 Pre-IPO 轮，拟赴港递交上市申请，募资约 3 亿美元"
+            },
+            "沐曦集成电路": {
+                "估值/市值": "约 180 亿元（Pre-IPO）",
+                "流动性": "未上市，场内流动性缺失",
+                "业绩要点": "2024 年营收 2.75 亿元，研发投入占比 78%，产品进入商业化阶段",
+                "股东背景": "创始人团队持股约 35%；美团、华为哈勃、中金资本等机构参投",
+                "公司背景": "2020 年成立，专注高性能通用计算芯片",
+                "产品优势": "MX1 系列 GPU 兼容主流软件生态，云计算与 AI 场景落地",
+                "财务报告": "未上市，公开财报有限",
+                "爆点新闻": "完成 C+ 轮融资，估值达 180 亿元，计划 2026 年申报科创板"
+            }
+        };
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表
+            initCharts();
+            
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 公司卡片筛选
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const companyCards = document.querySelectorAll('.company-card');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的活跃状态
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-primary', 'text-white');
+                        btn.classList.add('bg-light-1', 'text-dark-2');
+                    });
+                    
+                    // 设置当前按钮为活跃状态
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('bg-light-1', 'text-dark-2');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // 筛选卡片
+                    companyCards.forEach(card => {
+                        if (filter === 'all' || card.classList.contains(filter)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // 公司详情模态框
+            const detailsButtons = document.querySelectorAll('.details-btn');
+            const companyModal = document.getElementById('company-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModal = document.getElementById('close-modal');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            
+            // 打开模态框
+            detailsButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const companyCard = this.closest('.company-card');
+                    const companyName = companyCard.getAttribute('data-company');
+                    const companyInfo = companyData[companyName];
+                    
+                    // 设置模态框标题
+                    modalTitle.textContent = companyName + ' - 详细信息';
+                    
+                    // 填充模态框内容
+                    let content = '';
+                    for (const [key, value] of Object.entries(companyInfo)) {
+                        content += `
+                            <div>
+                                <h4 class="font-medium text-dark-2 mb-1">${key}</h4>
+                                <p class="text-dark">${value}</p>
+                            </div>
+                        `;
+                    }
+                    modalBody.innerHTML = content;
+                    
+                    // 显示模态框
+                    companyModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modalContent.classList.remove('scale-95', 'opacity-0');
+                        modalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                    
+                    // 阻止页面滚动
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            // 关闭模态框
+            function hideModal() {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    companyModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+            
+            closeModal.addEventListener('click', hideModal);
+            modalBackdrop.addEventListener('click', hideModal);
+            
+            // 导航栏滚动效果
+            const navbar = document.getElementById('navbar');
+            let lastScrollTop = 0;
+            
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > 50) {
+                    navbar.classList.add('shadow-md');
+                    navbar.classList.remove('shadow-sm');
+                } else {
+                    navbar.classList.remove('shadow-md');
+                    navbar.classList.add('shadow-sm');
+                }
+                
+                lastScrollTop = scrollTop;
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    // 关闭移动菜单（如果打开）
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 市值/估值对比图
+            const valuationCtx = document.getElementById('valuationChart').getContext('2d');
+            new Chart(valuationCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['海光信息', '寒武纪', '摩尔线程', '景嘉微', '壁仞科技', '沐曦集成电路'],
+                    datasets: [{
+                        label: '市值/估值（亿元）',
+                        data: [4053, 5700, 255, 412, 140, 180],
+                        backgroundColor: [
+                            'rgba(22, 93, 255, 0.7)',
+                            'rgba(54, 207, 201, 0.7)',
+                            'rgba(114, 46, 209, 0.7)',
+                            'rgba(255, 125, 0, 0.7)',
+                            'rgba(245, 63, 63, 0.7)',
+                            'rgba(102, 187, 106, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(22, 93, 255, 1)',
+                            'rgba(54, 207, 201, 1)',
+                            'rgba(114, 46, 209, 1)',
+                            'rgba(255, 125, 0, 1)',
+                            'rgba(245, 63, 63, 1)',
+                            'rgba(102, 187, 106, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(29, 33, 41, 0.9)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+            
+            // 营收对比图 - 明确标注时间范围
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        '海光信息 (2025Q1)', 
+                        '寒武纪 (2025上半年)', 
+                        '摩尔线程 (2024全年)', 
+                        '景嘉微 (2025上半年)', 
+                        '沐曦集成电路 (2024全年)'
+                    ],
+                    datasets: [{
+                        label: '营收（亿元）',
+                        data: [24.3, 28.81, 4.38, 3.2, 2.75],
+                        backgroundColor: [
+                            'rgba(22, 93, 255, 0.7)',
+                            'rgba(54, 207, 201, 0.7)',
+                            'rgba(114, 46, 209, 0.7)',
+                            'rgba(255, 125, 0, 0.7)',
+                            'rgba(102, 187, 106, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(22, 93, 255, 1)',
+                            'rgba(54, 207, 201, 1)',
+                            'rgba(114, 46, 209, 1)',
+                            'rgba(255, 125, 0, 1)',
+                            'rgba(102, 187, 106, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(29, 33, 41, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y + ' 亿元';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 融资对比图
+            const fundingCtx = document.getElementById('fundingChart').getContext('2d');
+            new Chart(fundingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['壁仞科技', '摩尔线程', '沐曦集成电路'],
+                    datasets: [{
+                        label: '累计融资（亿元）',
+                        data: [60, 45, 30],
+                        backgroundColor: [
+                            'rgba(245, 63, 63, 0.7)',
+                            'rgba(114, 46, 209, 0.7)',
+                            'rgba(102, 187, 106, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(245, 63, 63, 1)',
+                            'rgba(114, 46, 209, 1)',
+                            'rgba(102, 187, 106, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(29, 33, 41, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.x + ' 亿元';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+
+
+    </body></html>
